@@ -1,0 +1,53 @@
+digraph BioinformaticsPipeline {
+    // Set layout direction from Top to Bottom
+    rankdir=TB;
+    // Set global node style
+    node [shape=rectangle, style=filled, fontname="Helvetica", fontsize=12, margin=0.2];
+    // Set global edge style
+    edge [color="#7F7F7F"];
+    
+    // Cluster to group the pipeline
+    subgraph cluster0 {
+        label="";
+        style=filled;
+        color="#F5F5F5";
+        fontname="Helvetica";
+        fontsize=16;
+        labelloc="t";
+    
+        // Define nodes with soft, muted colors
+        S3Input [label="1. Data Ingestion\nAmazon S3", shape=folder, fillcolor="#B0E0E6"]; // Powder Blue
+        LambdaTrigger [label="2. Trigger Processing\nAWS Lambda", fillcolor="#98FB98"]; // Pale Green
+        QC [label="3. Quality Control\nAWS Batch", fillcolor="#FFDAB9"]; // Peach Puff
+        PreProcessing [label="4. Pre-Processing\nAWS Batch", fillcolor="#FFDAB9"]; // Peach Puff
+        Alignment [label="5. Alignment\nAWS Batch", fillcolor="#FFDAB9"]; // Peach Puff
+        CustomBioinformatics [label="6. Custom Bioinformatics\nAWS Batch", fillcolor="#FFDAB9"]; // Peach Puff
+        S3Output [label="7. Store Results\nAmazon RDS / Snowflake", shape=cylinder, fillcolor="#B0E0E6"];
+        Database [label="7a. Metadata Storage\nAmazon RDS / Snowflake", shape=cylinder, fillcolor="#E6E6FA"]; // Lavender
+        Visualization [label="8. Data Visualization\nCustom Python/HTML", fillcolor="#FFE4E1"]; // Misty Rose
+        MetaAnalysis [label="9. Meta Analysis\nCustom Python", fillcolor="#FFE4E1"]; // Misty Rose
+        Dashboard [label="10. Data Dashboard\nAmazon QuickSight", fillcolor="#FFE4E1"]; // Misty Rose
+        Notifications [label="Notifications\nAmazon SNS", shape=note, fillcolor="#FFFACD"]; // Lemon Chiffon
+    }
+    
+    // Define edges
+    S3Input -> LambdaTrigger;
+    LambdaTrigger -> QC;
+    QC -> PreProcessing;
+    PreProcessing -> Alignment;
+    Alignment -> CustomBioinformatics;
+    CustomBioinformatics -> S3Output;
+    CustomBioinformatics -> Database;
+
+    // Branch to Visualization
+    S3Output -> Visualization [style=dashed];
+    Database -> Visualization [style=dashed];
+    Visualization -> MetaAnalysis [style=dashed];
+    MetaAnalysis -> Dashboard [style=dashed];
+
+    // Notifications and Monitoring
+    QC -> Notifications [style=dotted];
+    PreProcessing -> Notifications [style=dotted];
+    Alignment -> Notifications [style=dotted];
+    CustomBioinformatics -> Notifications [style=dotted];
+}
